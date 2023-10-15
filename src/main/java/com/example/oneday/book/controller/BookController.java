@@ -1,18 +1,13 @@
 package com.example.oneday.book.controller;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
-
-import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.Errors;
-import org.springframework.validation.FieldError;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 import com.example.oneday.book.dto.BookCreateDTO;
 import com.example.oneday.book.dto.BookEditDTO;
 import com.example.oneday.book.dto.BookEditResponseDTO;
+import com.example.oneday.book.dto.BookListReponseDTO;
 import com.example.oneday.book.dto.BookReadResponseDTO;
 import com.example.oneday.book.service.BookService;
 
@@ -135,7 +131,25 @@ public class BookController {
 		return mav;
 	}
 	
+	// 책 삭제 기능
+	@PostMapping("/book/delete")
+	public String delete(Integer bookId) {
+		// hidden으로 bookId 가져온다 그런데 @RequestParam 쓰지 않아도 되는 이유는 뭘까?
+		// bookId의 빈이 이미 있으므로 커맨드 객체에 의해? 사용가능?? 
+		
+		this.bookService.delete(bookId);
+		return "redirect:/book/list";
+	}
 	
+	// 책 목록
+	@GetMapping(value = {"/book/list", "/book"})
+	public ModelAndView bookList(String title, Integer page, ModelAndView mav) {
+		mav.setViewName("/book/list");
+		
+		List<BookListReponseDTO> books = this.bookService.bookList(title, page);
+		mav.addObject("books", books);
+		return mav;
+	}
 	
 
 }

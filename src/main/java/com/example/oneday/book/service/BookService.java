@@ -1,12 +1,20 @@
 package com.example.oneday.book.service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.domain.Sort.Order;
 import org.springframework.stereotype.Service;
 
 import com.example.oneday.book.dto.BookCreateDTO;
 import com.example.oneday.book.dto.BookEditDTO;
 import com.example.oneday.book.dto.BookEditResponseDTO;
+import com.example.oneday.book.dto.BookListReponseDTO;
 import com.example.oneday.book.dto.BookReadResponseDTO;
 import com.example.oneday.book.entity.Book;
 import com.example.oneday.book.entity.BookRepository;
@@ -93,7 +101,43 @@ public class BookService {
 		
 		// Book 엔티티의 경우
 		// bookId의 값이 비어있는지 검사해서 insert update 확인하고 실행
-		
 	}
+	
+	// 책 삭제 기능
+	public void delete(Integer bookId) throws NoSuchElementException {
+		// 책 삭제 기능은 '책 정보를 읽어서 지우는' 과정
+		
+		Book book = this.bookRepository.findById(bookId).orElseThrow();
+		
+		this.bookRepository.delete(book);
+		log.info("{}", book.toString());
+	}
+	
+	// 책 목록
+	public List<BookListReponseDTO> bookList(String title, Integer page) {
+		final int pageSize = 3;
+		
+		List<Book> books;
+		
+		if(page == null) {
+			page = 0;
+		}else {
+			page -= 1;
+		}
+		
+		if(title == null) {
+			Pageable pageable = PageRequest.of(page, pageSize, Direction.DESC, "insertDateTime");
+			books = this.bookRepository.findAll(pageable).toList();
+		}else {
+			Pageable pageable = PageRequest.of(page, pageSize);
+			Sort sort = Sort.by(Order.desc("insertDateTime"));
+			pageable.getSort().and(sort);
+			books = this.bookRepository.findByTitleContains(title, pageable);
+		}
+		return books.stream()
+				.map(book -> new BookListReponseDTO(book.getBookId(), book.getTitle()))
+				.collect(Collectors.toList());
+	}
+	
 
 }

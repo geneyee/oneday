@@ -5,6 +5,7 @@ import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 
 import com.example.oneday.book.dto.BookCreateDTO;
+import com.example.oneday.book.dto.BookEditDTO;
 import com.example.oneday.book.dto.BookEditResponseDTO;
 import com.example.oneday.book.dto.BookReadResponseDTO;
 import com.example.oneday.book.entity.Book;
@@ -72,6 +73,27 @@ public class BookService {
 		
 		// entity -> dto
 		return BookEditResponseDTO.BookFactory(book);
+	}
+	
+	// 책 수정 기능
+	public void update(BookEditDTO bookEditDTO) throws NoSuchElementException {
+		// 책 수정 기능은 '책 정보를 읽어서 매개변수로 채운 후 저장' 하는 과정
+		Book book = this.bookRepository.findById(bookEditDTO.getBookId()).orElseThrow();
+		
+		// dto -> entity
+		book = bookEditDTO.fill(book);
+		
+		// entity DB에 저장
+		this.bookRepository.save(book);
+		
+		// jpa에서는 입력(insert), 수정(update) 둘 다 save 메소드 사용
+		// save 메소드가 호출되었을 때 입력인지 수정인지 결정하는 규칙은 간단하다
+		// pk(@Id)가 비어 있다면(==null) insert
+		// != null 이면 update
+		
+		// Book 엔티티의 경우
+		// bookId의 값이 비어있는지 검사해서 insert update 확인하고 실행
+		
 	}
 
 }

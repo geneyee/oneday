@@ -1,6 +1,8 @@
 package com.example.oneday.book.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.example.oneday.book.entity.Book;
 
@@ -16,12 +18,19 @@ public class BookReadResponseDTO { // 책 조회
 	private Integer price;
 	private LocalDateTime insertDateTime;
 	
+	private List<BookLogReadResponseDTO> bookLogs;
+	
 	// dto -> entity
 	public BookReadResponseDTO fromBook(Book book) {
 		this.bookId = book.getBookId();
 		this.title = book.getTitle();
 		this.price = book.getPrice();
 		this.insertDateTime = book.getInsertDateTime();
+		
+		this.bookLogs = book.getBookList().stream()
+				.map(bookLog -> BookLogReadResponseDTO.BookLogFactory(bookLog))
+				.collect(Collectors.toList());
+		
 		return this;
 	}
 	

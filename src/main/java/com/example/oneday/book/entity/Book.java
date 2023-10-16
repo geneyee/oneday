@@ -1,12 +1,16 @@
 package com.example.oneday.book.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -36,16 +40,32 @@ public class Book {
 	
 	@CreationTimestamp
 	private LocalDateTime insertDateTime;
+	
+	@OneToMany(mappedBy = "book", fetch = FetchType.LAZY)
+//	@Builder.Default // null 방지
+	private List<BookLog> bookList = new ArrayList<>();
 
 	
-	@Builder // @AllArgsConstructor 대체
-	public Book(Integer bookId, String title, Integer price, LocalDateTime insertDateTime) {
+//	@Builder // @AllArgsConstructor 대체
+//	public Book(Integer bookId, String title, Integer price, LocalDateTime insertDateTime) {
+//		super();
+//		this.bookId = bookId;
+//		this.title = title;
+//		this.price = price;
+//		this.insertDateTime = insertDateTime;
+//	}
+
+	@Builder
+	public Book(Integer bookId, String title, Integer price, LocalDateTime insertDateTime, List<BookLog> bookList) {
 		super();
 		this.bookId = bookId;
 		this.title = title;
 		this.price = price;
 		this.insertDateTime = insertDateTime;
+		this.bookList = bookList;
 	}
+
+		
 
 	
 	
